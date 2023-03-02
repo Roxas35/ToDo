@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:todolist/class/todo_list.dart';
 
 class MyHomePage extends StatefulWidget {
-  String title;
-  MyHomePage({super.key, required this.title});
+  final String title;
+  const MyHomePage({super.key, required this.title});
 
   @override
   State<StatefulWidget> createState() => _MyHomePageState();
@@ -27,20 +27,52 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> _drawTasks(CategoryEnum category) {
-    List<Widget> result = [];
-    for (Task task in taskList.where((el) => el.category == category).toList()) {
-      result.add(ListTile(title: Text(task.name)));
-    }
-    return result;
+    return taskList
+      .where((el) => el.category == category)
+      .map(
+        (task) => ListTile(
+          leading: Checkbox(
+            value: task.done,
+            onChanged: (bool? value) {
+              setState(() {
+                task.done = value!;
+              });
+            },
+          ),
+          title: Text(task.name),
+      )
+    )
+    .toList();
   }
 
   List<Widget> _drawTodoList() {
     List<Widget> result = [];
     for (CategoryEnum category in CategoryEnum.values) {
       List<Widget> internalContainerListView = [];
-      internalContainerListView.add(Text(category.name));
+      internalContainerListView.add(
+        Container(
+          margin: const EdgeInsets.all(12),
+          child: Text(
+            category.name.toUpperCase(),
+            style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold),
+      ),
+      ));
       internalContainerListView.addAll(_drawTasks(category));
       result.add(Container(
+        margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 5,
+              ),
+            ]
+          ),
           child: Column(
         children: internalContainerListView,
       )));
